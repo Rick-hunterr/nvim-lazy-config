@@ -1,0 +1,5 @@
+# Archivos de la caché y plugins de Neovim
+lazy
+packer_compiled.lua
+*.swp
+*.bak
