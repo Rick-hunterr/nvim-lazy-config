@@ -1,15 +1,15 @@
 -- ===================================================
--- Lista de plugins y su configuración
+-- Plugin List - Main Entry Point
 -- ===================================================
 
 return {
-  -- Importa los plugins desde archivos separados
-  require("plugins.colorscheme"),
-  require("plugins.ui"),
-  require("plugins.editor"),
-  require("plugins.lsp"),
-  require("plugins.telescope"),
-  require("plugins.treesitter"),
-  require("plugins.git"),
-  require("plugins.tools"),
+    -- Load all plugin modules
+    { import = "plugins.colorscheme" },
+    { import = "plugins.ui" },
+    { import = "plugins.editor" },
+    { import = "plugins.lsp" },
+    { import = "plugins.telescope" },
+    { import = "plugins.treesitter" },
+    { import = "plugins.git" },
+    { import = "plugins.tools" },
 }

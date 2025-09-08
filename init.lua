@@ -1,13 +1,15 @@
 -- ===================================================
--- Init.lua Cyberpunk Neon - Neovim 0.10+
+-- Neovim Configuration - Cyberpunk Theme
+-- Author: Bits Hunter  
+-- Version: 2.0 (Lazy.nvim)
 -- ===================================================
 
--- Instala Lazy.nvim si no está presente
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-    vim.fn.system({"git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath,})
-end
-vim.opt.rtp:prepend(lazypath)
+-- PASO 1: Definir leader keys INMEDIATAMENTE
+vim.g.mapleader = " "
+vim.g.maplocalleader = ","
 
--- Carga la configuración modular
-require("config")
+-- PASO 2: Cargar lazy DESPUÉS de definir leader keys
+require("config.lazy")
+
+-- PASO 3: Cargar configuración del core AL FINAL
+require("config").setup() -- Llamar explícitamente a setup()
