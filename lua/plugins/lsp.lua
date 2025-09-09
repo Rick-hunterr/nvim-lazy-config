@@ -1,9 +1,8 @@
 -- ===================================================
 -- LSP and Completion Configuration
 -- ===================================================
-
 return {
-    -- LSP Configuration
+    -- El cliente LSP principal de Neovim
     {
         "neovim/nvim-lspconfig",
         event = { "BufReadPre", "BufNewFile" },
@@ -13,8 +12,17 @@ return {
             "hrsh7th/cmp-nvim-lsp",
             { "folke/neodev.nvim", opts = {} },
         },
+        -- ¡La configuración de nvim-lspconfig va aquí!
+    },
+
+    -- ===================================================
+    -- Gestión de LSP Servers con Mason
+    -- ===================================================
+
+    -- Plugin principal de Mason
+    {
+        "williamboman/mason.nvim",
         config = function()
-            -- Setup mason first
             require("mason").setup({
                 ui = {
                     border = "rounded",
@@ -25,15 +33,22 @@ return {
                     },
                 },
             })
+        end,
+    },
 
-            -- Setup mason-lspconfig
+    -- Conecta Mason con nvim-lspconfig
+    {
+        "williamboman/mason-lspconfig.nvim",
+        dependencies = {
+            "williamboman/mason.nvim",
+        },
+        config = function()
             require("mason-lspconfig").setup({
                 ensure_installed = {
                     "lua_ls",
                     "pyright",
                     "tsserver",
                     "rust_analyzer",
-                    "gopls",
                     "html",
                     "cssls",
                     "jsonls",

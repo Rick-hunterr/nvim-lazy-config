@@ -81,6 +81,70 @@ return {
     end,
   },
 
+  -- Nvim-tree (File Explorer)
+
+-- File Explorer
+{
+  "nvim-tree/nvim-tree.lua",
+  version = "*",
+  lazy = false,
+  dependencies = {
+    "nvim-tree/nvim-web-devicons",
+  },
+  config = function()
+    require("nvim-tree").setup({
+      -- Deshabilita el explorador de archivos predeterminado
+      disable_netrw = true,
+      -- Vuelve al buffer sin nombre cuando cierras nvim-tree
+      hijack_netrw = true,
+      -- Configuración de la vista del árbol
+      view = {
+        width = 30,
+        -- Muestra los diagnósticos de LSP
+        side = "left",
+      },
+      -- Comportamiento al abrir archivos
+      actions = {
+        open_file = {
+          quit_on_open = true,
+        },
+      },
+      -- Habilita el seguimiento del archivo actual
+      update_focused_file = {
+        enable = true,
+        update_root = false,
+      },
+      -- Muestra el estado de Git
+      git = {
+        enable = true,
+      },
+      -- Muestra los diagnósticos de LSP
+      diagnostics = {
+        enable = true,
+        show_on_dirs = true,
+      },
+      -- Cierra el explorador si es la última ventana
+      renderer = {
+        group_empty = true,
+        highlight_git = true,
+        icons = {
+          show = {
+            git = true,
+            diagnostics = true,
+          },
+        },
+      },
+      filters = {
+        dotfiles = false,
+        git_ignored = false,
+      },
+    })
+    
+    -- Mapeo de teclas para nvim-tree
+    vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file explorer" })
+  end,
+},
+
   -- Alpha Dashboard (Enhanced with Project Preview)
   {
     "goolord/alpha-nvim",
@@ -164,18 +228,18 @@ return {
       end
 
       -- Enhanced menu buttons
-      dashboard.section.buttons.val = {
-        dashboard.button("f", "  Find file", ":Telescope find_files<CR>"),
-        dashboard.button("n", "  New file", ":ene <BAR> startinsert<CR>"),
-        dashboard.button("r", "  Recent files", ":Telescope oldfiles<CR>"),
-        dashboard.button("g", "  Find text", ":Telescope live_grep<CR>"),
-        dashboard.button("p", "  Projects", ":Telescope projects<CR>"),
-        dashboard.button("s", "  Sessions", ":SearchSession<CR>"),
-        dashboard.button("c", "  Configuration", ":e $MYVIMRC<CR>"),
-        dashboard.button("l", "󰒲  Lazy", ":Lazy<CR>"),
-        dashboard.button("m", "  Mason", ":Mason<CR>"),
-        dashboard.button("q", "  Quit", ":qa<CR>"),
-      }
+dashboard.section.buttons.val = {
+  dashboard.button("f", "󰈞  Find file", ":Telescope find_files<CR>"),
+  dashboard.button("n", "  New file", ":ene <BAR> startinsert<CR>"),
+  dashboard.button("r", "  Recent files", ":Telescope oldfiles<CR>"),
+  dashboard.button("g", "󰈕  Find text", ":Telescope live_grep<CR>"),
+  dashboard.button("p", "  Projects", ":Telescope file_browser<CR>"),
+  --dashboard.button("s", "󰆊  Sessions", ":SearchSession<CR>"),
+  dashboard.button("c", "  Configuration", ":e $MYVIMRC<CR>"),
+  dashboard.button("l", "󰒲  Lazy", ":Lazy<CR>"),
+  dashboard.button("m", "󰙅  Mason", ":Mason<CR>"),
+  dashboard.button("q", "  Quit", ":qa<CR>"),
+}
 
       -- Custom footer with system info
       local function footer()
@@ -319,123 +383,8 @@ return {
       })
     end,
   },
-
-  -- Neo-tree (File explorer)
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    branch = "v3.x",
-    cmd = "Neotree",
-    keys = {
-      { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "Toggle file explorer" },
-      { "<leader>E", "<cmd>Neotree focus<cr>", desc = "Focus file explorer" },
-    },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
-      "MunifTanjim/nui.nvim",
-    },
-    config = function()
-      require("neo-tree").setup({
-        close_if_last_window = true,
-        popup_border_style = "rounded",
-        enable_git_status = true,
-        enable_diagnostics = true,
-        default_component_configs = {
-          container = {
-            enable_character_fade = true,
-          },
-          indent = {
-            indent_size = 2,
-            padding = 1,
-            with_markers = true,
-            indent_marker = "│",
-            last_indent_marker = "└",
-            highlight = "NeoTreeIndentMarker",
-          },
-          icon = {
-            folder_closed = "",
-            folder_open = "",
-            folder_empty = "",
-            default = "*",
-            highlight = "NeoTreeFileIcon",
-          },
-          modified = {
-            symbol = "[+]",
-            highlight = "NeoTreeModified",
-          },
-          name = {
-            trailing_slash = false,
-            use_git_status_colors = true,
-            highlight = "NeoTreeFileName",
-          },
-          git_status = {
-            symbols = {
-              added = "",
-              modified = "",
-              deleted = "✖",
-              renamed = "",
-              untracked = "",
-              ignored = "",
-              unstaged = "",
-              staged = "",
-              conflict = "",
-            },
-          },
-        },
-        window = {
-          position = "left",
-          width = 35,
-          mapping_options = {
-            noremap = true,
-            nowait = true,
-          },
-          mappings = {
-            ["<space>"] = "none",
-            ["<CR>"] = "open",
-            ["l"] = "open",
-            ["h"] = "close_node",
-            ["v"] = "open_vsplit",
-            ["s"] = "open_split",
-            ["C"] = "close_node",
-            ["z"] = "close_all_nodes",
-            ["R"] = "refresh",
-            ["a"] = "add",
-            ["d"] = "delete",
-            ["r"] = "rename",
-            ["y"] = "copy_to_clipboard",
-            ["x"] = "cut_to_clipboard",
-            ["p"] = "paste_from_clipboard",
-            ["c"] = "copy",
-            ["m"] = "move",
-            ["q"] = "close_window",
-            ["?"] = "show_help",
-          },
-        },
-        filesystem = {
-          filtered_items = {
-            visible = false,
-            hide_dotfiles = false,
-            hide_gitignored = false,
-            hide_hidden = false,
-          },
-          follow_current_file = {
-            enabled = true,
-          },
-          use_libuv_file_watcher = true,
-        },
-        buffers = {
-          follow_current_file = {
-            enabled = true,
-          },
-        },
-        git_status = {
-          window = {
-            position = "float",
-          },
-        },
-      })
-    end,
-  },
+  
+  
 
   -- Bufferline (Enhanced Tab Bar)
   {
@@ -708,6 +657,42 @@ return {
       })
     end,
   },
+  
+
+-- Auto Session Plugin
+{
+  "rmagatti/auto-session",
+  config = function()
+    require("auto-session").setup({
+      log_level = "error",
+      auto_session_suppress_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
+      auto_session_use_git_branch = false,
+      auto_session_enable_last_session = false,
+      auto_restore_enabled = false,
+      auto_save_enabled = true,
+      session_lens = {
+        buftypes_to_ignore = {},
+        load_on_setup = true,
+        theme_conf = { border = true },
+        previewer = false,
+      },
+    })
+    
+    -- Keymaps para manejo de sesiones
+    vim.keymap.set("n", "<leader>ss", require("auto-session.session-lens").search_session, {
+      noremap = true,
+      desc = "Search sessions",
+    })
+    vim.keymap.set("n", "<leader>sr", "<cmd>SessionRestore<CR>", {
+      noremap = true, 
+      desc = "Restore session",
+    })
+    vim.keymap.set("n", "<leader>sd", "<cmd>SessionDelete<CR>", {
+      noremap = true,
+      desc = "Delete session", 
+    })
+  end,
+},
 
   -- Smooth Scrolling
   {

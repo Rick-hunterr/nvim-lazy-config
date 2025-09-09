@@ -5,8 +5,7 @@
 return {
     {
         "nvim-telescope/telescope.nvim",
-        cmd = "Telescope",
-        version = false,
+        branch = "0.1.x",
         dependencies = {
             "nvim-lua/plenary.nvim",
             "nvim-tree/nvim-web-devicons",
@@ -14,11 +13,16 @@ return {
             {
                 "nvim-telescope/telescope-fzf-native.nvim",
                 build = "make",
-                config = function()
-                    require("telescope").load_extension("fzf")
-                end,
+            },
+            {
+                "ahmedkhalf/project.nvim",
+            },
+            {
+                "nvim-telescope/telescope-file-browser.nvim",
             },
         },
+        
+        -- Key mappings
         keys = {
             { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
             { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live grep" },
@@ -40,11 +44,19 @@ return {
             { "<leader>gb", "<cmd>Telescope git_branches<cr>", desc = "Git branches" },
             { "<leader>gs", "<cmd>Telescope git_status<cr>", desc = "Git status" },
             { "<leader>gf", "<cmd>Telescope git_files<cr>", desc = "Git files" },
+            -- File Browser
+            { "<leader>fe", "<cmd>Telescope file_browser<cr>", desc = "File Browser" },
         },
+        
         config = function()
             local telescope = require("telescope")
             local actions = require("telescope.actions")
-            local trouble = require("trouble.providers.telescope")
+            
+            -- Check if trouble is available before using it
+            local trouble_available, trouble = pcall(require, "trouble.providers.telescope")
+            if not trouble_available then
+                trouble = nil
+            end
 
             telescope.setup({
                 defaults = {
@@ -122,7 +134,6 @@ return {
                             ["<M-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
                             ["<C-l>"] = actions.complete_tag,
                             ["<C-_>"] = actions.which_key,
-                            ["<c-t>"] = trouble.open_with_trouble,
                         },
                         n = {
                             ["<esc>"] = actions.close,
@@ -148,7 +159,6 @@ return {
                             ["<PageUp>"] = actions.results_scrolling_up,
                             ["<PageDown>"] = actions.results_scrolling_down,
                             ["?"] = actions.which_key,
-                            ["<c-t>"] = trouble.open_with_trouble,
                         },
                     },
                 },
@@ -207,11 +217,31 @@ return {
                         override_file_sorter = true,
                         case_mode = "smart_case",
                     },
+                    file_browser = {
+                        previewer = true,
+                        theme = "ivy",
+                        hijack_netrw = true,
+                    },
                 },
             })
 
-            -- Load extensions
+            -- Load extensions with error handling
             pcall(telescope.load_extension, "fzf")
+            pcall(telescope.load_extension, "projects")
+            pcall(telescope.load_extension, "file_browser")
+
+            -- Add trouble integration if available
+            if trouble_available then
+                local function add_trouble_mappings()
+                    local i_mappings = telescope.config.defaults.mappings.i or {}
+                    local n_mappings = telescope.config.defaults.mappings.n or {}
+                    
+                    i_mappings["<c-t>"] = trouble.open_with_trouble
+                    n_mappings["<c-t>"] = trouble.open_with_trouble
+                end
+                
+                pcall(add_trouble_mappings)
+            end
 
             -- Custom highlights for cyberpunk theme
             vim.api.nvim_set_hl(0, "TelescopeNormal", { bg = "NONE" })
@@ -227,22 +257,33 @@ return {
             vim.api.nvim_set_hl(0, "TelescopeMatching", { fg = "#00FFFF", bold = true })
         end,
     },
-
-    -- Projects extension
+    
+    -- Optional: Session management with auto-session (more stable alternative)
     {
-        "ahmedkhalf/project.nvim",
+        "rmagatti/auto-session",
         config = function()
-            require("project_nvim").setup({
-                detection_methods = { "lsp", "pattern" },
-                patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json" },
-                ignore_lsp = {},
-                exclude_dirs = {},
-                show_hidden = false,
-                silent_chdir = true,
-                scope_chdir = "global",
-                datapath = vim.fn.stdpath("data"),
+            require("auto-session").setup({
+                log_level = "error",
+                auto_session_suppress_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
+                auto_session_enable_last_session = false,
+                auto_session_root_dir = vim.fn.stdpath("data") .. "/sessions/",
+                auto_session_enabled = true,
+                auto_save_enabled = nil,
+                auto_restore_enabled = nil,
+                auto_session_use_git_branch = nil,
             })
-            require("telescope").load_extension("projects")
+            
+            -- Session management keymaps
+            vim.keymap.set("n", "<leader>ss", "<cmd>SessionSave<cr>", { desc = "Save Session" })
+            vim.keymap.set("n", "<leader>sr", "<cmd>SessionRestore<cr>", { desc = "Restore Session" })
+            vim.keymap.set("n", "<leader>sd", "<cmd>SessionDelete<cr>", { desc = "Delete Session" })
+            vim.keymap.set("n", "<leader>ft", "<cmd>Telescope session-lens search_session<cr>", { desc = "Find Sessions" })
         end,
+        keys = {
+            { "<leader>ss", "<cmd>SessionSave<cr>", desc = "Save Session" },
+            { "<leader>sr", "<cmd>SessionRestore<cr>", desc = "Restore Session" },
+            { "<leader>sd", "<cmd>SessionDelete<cr>", desc = "Delete Session" },
+            { "<leader>ft", "<cmd>Telescope session-lens search_session<cr>", desc = "Find Sessions" },
+        },
     },
 }

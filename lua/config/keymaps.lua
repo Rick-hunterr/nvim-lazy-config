@@ -106,3 +106,6 @@ keymap("n", "#", function()
         vim.cmd("nohlsearch")
     end, 100)
 end, { desc = "Search word backward (no persistent highlight)" })
+
+
+vim.keymap.set("n", "<leader>q", "<cmd>BufferCloseAllButCurrent<CR>", { desc = "Close all buffers except the current one" })
